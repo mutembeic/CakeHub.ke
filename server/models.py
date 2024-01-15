@@ -17,7 +17,7 @@ class Cake(db.Model):
 
     category = db.relationship('Category', backref='cakes')
 
-class Customer(db.Model):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(200), nullable=False)
     last_name = db.Column(db.String(200), nullable=False)
@@ -28,17 +28,17 @@ class Customer(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     order_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     total_amount = db.Column(db.Numeric(precision=10, scale=2), nullable=False)
     order_status = db.Column(db.String(200))
     shipping_address = db.Column(db.String(200))
-    created_by = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
-    modified_by = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    modified_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    customer = db.relationship('Customer', backref='orders')
-    creator = db.relationship('Customer', foreign_keys=[created_by], backref='created_orders')
-    modifier = db.relationship('Customer', foreign_keys=[modified_by], backref='modified_orders')
+    user = db.relationship('User', backref='orders', foreign_keys=[user_id])
+    creator = db.relationship('User', foreign_keys=[created_by], backref='created_orders')
+    modifier = db.relationship('User', foreign_keys=[modified_by], backref='modified_orders')
 
 class OrderItem(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), primary_key=True)
@@ -46,5 +46,8 @@ class OrderItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     unit_price = db.Column(db.Numeric(precision=10, scale=2), nullable=False)
 
-    order = db.relationship('Order', backref='order_items')
-    cake = db.relationship('Cake', backref='order_items')
+    order = db.relationship('Order', backref='order_items', foreign_keys=[order_id])
+    cake = db.relationship('Cake', backref='order_items', foreign_keys=[cake_id])
+
+
+     
