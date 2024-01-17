@@ -50,4 +50,26 @@ class OrderItem(db.Model):
     cake = db.relationship('Cake', backref='order_items', foreign_keys=[cake_id])
 
 
+class ShoppingCartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cake_id = db.Column(db.Integer, db.ForeignKey('cake.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+    cake = db.relationship('Cake', backref='cart_items')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "cake_id": self.cake_id,
+            "cake_name": self.cake.name,
+            "price": float(self.cake.price),
+            "quantity": self.quantity
+        }
+    
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(200), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+    def __repr__(self):
+        return f"Admin(id={self.id}, username={self.username})"
      
