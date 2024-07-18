@@ -24,13 +24,16 @@ def home():
 class SignUp(Resource):
     def post(self):
         data=request.get_json()
+        first_name=data['first_name']
+        last_name=data['last_name']
         username=data['username']
         email=data['email']
+        address=data['address']
         password=data['password']
         if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
             return {"Error":"Username Already Exists"},401
         else:
-            new_user=User(username=username,email=email,password=generate_password_hash(password))
+            new_user=User(first_name=first_name,last_name=last_name,username=username,email=email,address=address,password=generate_password_hash(password))
             db.session.add(new_user)
             db.session.commit()
             return {"Message": "Sign-Up Successful!!"},201
@@ -68,7 +71,7 @@ class Logout(Resource):
 class CakeListing(Resource):
     def get(self):
         cakes = Cake.query.all()
-        return jsonify({"cakes": [{"id": cake.id, "name": cake.name, "category_id": cake.category_id, "price": float(cake.price)} for cake in cakes]})
+        return jsonify({"cakes": [{"id": cake.id, "name": cake.name, "image_url": cake.image_url, "category_id": cake.category_id, "price": float(cake.price)} for cake in cakes]})
 
 class CakeDetails(Resource):
     def get(self, cake_id):
@@ -297,7 +300,9 @@ class UserAccountDashboard(Resource):
 
         return jsonify({"user": user_data, "order_history": order_history})
 
- 
+api.add_resource(SignUp,'/sign_up')
+api.add_resource(Login,'/login')
+api.add_resource(Logout,'/logout')
 api.add_resource(CakeListing, '/cakes')
 api.add_resource(CakeDetails, '/cakes/<int:cake_id>')
 api.add_resource(CategoryCakeListing, '/cakes/category/<int:category_id>')
